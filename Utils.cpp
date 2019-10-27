@@ -280,14 +280,14 @@ map<string,Player*> Utils::processOrderByPreflop(map<Player*,string> players,Dec
                                 // if BB call, game done, count mainpot and chips.
                                 // if BB fold, game done, count mainpot and chips.
 
-                //Turn show card four on the table
-                //turn-round
+                //river show card five on the table
+                //River-round
                    //SB can raise and call, Fold, all in.
-                        // if call will go to river.
+                        // if call will game done, count mainpot and chips.
                         // if SB raise
-                                // if BB call, will go to river.
+                                // if BB call, will game done, count mainpot and chips.
                                 // if BB raise
-                                    // if SB call, will go to river.
+                                    // if SB call, will game done, count mainpot and chips.
                                     // if SB raise
                          //if SB fold, BB game done, count mainpot and chips add to BB.
                          //if SB all in
