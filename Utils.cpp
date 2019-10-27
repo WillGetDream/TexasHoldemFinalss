@@ -204,15 +204,107 @@ map<string,Player*> Utils::processOrderByPreflop(map<Player*,string> players,Dec
     Position position;
     map<string,Player*> map;
     queue<Player> q;
+    vector<Player> vp;
     int mainPot;
 
     //sort to queue
     switch(players.size()){
-        case 2:{
+        case 2: {
+
+            //sort for order by sb-bb to a vector,count main pot
+                //find sb and bb
+                for (auto it = players.begin(); it != players.end(); ++it){
+                    if (it->second == position.SB) {
+                        it->first->chips = it->first->chips - blind;
+                        cout << it->first->name << " blind: " << blind << endl;
+                        cout << it->first->name << " chips: " << it->first->chips << endl;
+                        vp.push_back(*it->first);
+                    }
+                }
+                for (auto it = players.begin(); it != players.end(); ++it){
+                    if (it->second == position.BB) {
+                        it->first->chips = it->first->chips - blind*2;
+                        cout << it->first->name << " blind: " << blind << endl;
+                        cout << it->first->name << " chips: " << it->first->chips << endl;
+                        vp.push_back(*it->first);
+                    }
+                }
+                //deal card in order, everyone get two cards
+                for(int i=0;i<vp.size();i++){
+                    vp.at(i).card[i]=deck->dealCard();
+                }
+                //count mainpot
+                mainPot=blind*3;
+
+                //define a value for truning to next step
+               //Pre-flop refers to the action that occurs before the flop is dealt
+                    //SB can raise and call, Fold, all in.
+                        // if call will go to flop.
+                        // if SB raise
+                                // if BB call, will go to flop.
+                                // if BB raise
+                                    // if SB call, will go to flop.
+                                    // if SB raise
+                         //if SB fold, BB game done, count mainpot and chips add to BB.
+                         //if SB all in
+                                // if BB call, game done, count mainpot and chips.
+                                // if BB fold, game done, count mainpot and chips.
+
+
+                //flop show three cards on the table
+                //Flop-round
+                    //SB can raise and call, Fold, all in.
+                        // if call will go to Turn.
+                        // if SB raise
+                                // if BB call, will go to Turn.
+                                // if BB raise
+                                    // if SB call, will go to Turn.
+                                    // if SB raise
+                         //if SB fold, BB game done, count mainpot and chips add to BB.
+                         //if SB all in
+                                // if BB call, game done, count mainpot and chips.
+                                // if BB fold, game done, count mainpot and chips.
+
+
+                //Turn show card four on the table
+                //turn-round
+                    //SB can raise and call, Fold, all in.
+                        // if call will go to river.
+                        // if SB raise
+                                // if BB call, will go to river.
+                                // if BB raise
+                                    // if SB call, will go to river.
+                                    // if SB raise
+                         //if SB fold, BB game done, count mainpot and chips add to BB.
+                         //if SB all in
+                                // if BB call, game done, count mainpot and chips.
+                                // if BB fold, game done, count mainpot and chips.
+
+                //Turn show card four on the table
+                //turn-round
+                   //SB can raise and call, Fold, all in.
+                        // if call will go to river.
+                        // if SB raise
+                                // if BB call, will go to river.
+                                // if BB raise
+                                    // if SB call, will go to river.
+                                    // if SB raise
+                         //if SB fold, BB game done, count mainpot and chips add to BB.
+                         //if SB all in
+                                // if BB call, game done, count mainpot and chips.
+                                // if BB fold, game done, count mainpot and chips.
+
+
+
+
+
+
+
+
             for (auto it = players.begin(); it != players.end(); ++it)
                 if (it->second == position.SB) {
-                    it->first->card[0]=deck->dealCard();
-                    it->first->card[1]=deck->dealCard();
+//                    it->first->card[0]=deck->dealCard();
+//                    it->first->card[1]=deck->dealCard();
                     it->first->chips=it->first->chips-blind;
                     cout<<it->first->name<<" blind: "<<blind<<endl;
                     cout<<it->first->name<<" chips: "<<it->first->chips<<endl;
@@ -221,8 +313,8 @@ map<string,Player*> Utils::processOrderByPreflop(map<Player*,string> players,Dec
                 }
             for (auto it = players.begin(); it != players.end(); ++it)
                 if (it->second == position.BB) {
-                    it->first->card[0] = deck->dealCard();
-                    it->first->card[1] = deck->dealCard();
+//                    it->first->card[0] = deck->dealCard();
+//                    it->first->card[1] = deck->dealCard();
                     it->first->chips=it->first->chips-blind*2;
                     cout<<it->first->name<<" big blind: "<<blind*2<<endl;
                     cout<<it->first->name<<" chips: "<<it->first->chips<<endl;
@@ -230,8 +322,12 @@ map<string,Player*> Utils::processOrderByPreflop(map<Player*,string> players,Dec
                     q.push(*it->first);
                 }
 
-            mainPot=blind*3;
-            //if not empty keep call
+
+            //Pre-flop
+                //if sb call, turn to Flop
+
+
+            //if not empty keep call. If player fold or out of money, he will push out from queue.
             list<Player> maplist;
             int raise=0;
             while(q.size()>0){
