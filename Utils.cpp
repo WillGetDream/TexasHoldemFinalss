@@ -22,6 +22,9 @@
 #include <queue>
 #include <algorithm>
 #include "DeckOfCards.h"
+#define fold "fold"
+#define active "active"
+#define allin "allin"
 
 using namespace std;
 
@@ -199,7 +202,7 @@ map<Player *, string> Utils::getRandomPosition(map<string, int> p) {
 }
 
 
-map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players, DeckOfCards *deck, int blind) {
+map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players, DeckOfCards *deck, int blind,string playername) {
     Position position;
     map<string, Player *> map;
     queue<Player> q;
@@ -214,23 +217,31 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
             //find sb and bb
             for (auto it = players.begin(); it != players.end(); ++it) {
                 if (it->second == position.SB) {
-                    it->first->chips = it->first->chips - blind;
-                    cout << it->first->name << " blind: " << blind << endl;
+                    it->first->chipsOnTable=blind;
+                    it->first->chips = it->first->chips - it->first->chipsOnTable;
+                    cout << it->first->name << " blind: " <<  it->first->chipsOnTable << endl;
                     cout << it->first->name << " chips: " << it->first->chips << endl;
                     vp.push_back(*it->first);
                 }
             }
             for (auto it = players.begin(); it != players.end(); ++it) {
                 if (it->second == position.BB) {
-                    it->first->chips = it->first->chips - blind * 2;
-                    cout << it->first->name << " blind: " << blind << endl;
-                    cout << it->first->name << " chips: " << it->first->chips << endl;
+                    it->first->chipsOnTable= blind * 2;
+                    it->first->chips = it->first->chips - it->first->chipsOnTable;
+                    cout << it->first->name << " blind: " << it->first->chipsOnTable << endl;
+                    cout << it->first->name << " chips: " << it->first->chips<< endl;
                     vp.push_back(*it->first);
                 }
             }
+
+            cout<<endl;
             //deal card in order, everyone get two cards
             for (int i = 0; i < vp.size(); i++) {
-                vp.at(i).card[i] = deck->dealCard();
+                vp.at(i).card[0] = deck->dealCard();
+                vp.at(i).card[1] = deck->dealCard();
+                if(!playername.compare(vp.at(i).name )){
+                    cout<<"you card is :"<< endl<<vp.at(i).card[0].print()<<endl<< vp.at(i).card[1].print()<<endl;
+                }
             }
             //count mainpot
             mainPot = blind * 3;
@@ -257,73 +268,313 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
              *       if raise ,cout player base chips and raise chips,and mainpot
              *          pop out this player
              *            push other player to queue
-             *  }
-             * */
+             *        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ below code flow
+             *  player option,
+            *      if call
+            *          check if exist all in,if chips more than largest of all in ,then you can call , if less, only can all in.
+            *          check how much and count chips and mainpot,sidepot and show the info  go to next player in queue,if  queue=0 thus go to flop
+            *             if raise
+
+            *if player fold, go to next player in queue,if queue=0 thus BB game done, count mainpot and chips add to player, show info.
+            *      if all in, push other player into queue, count the all in money for other player.
+            *          if first all
+            *              check if it is smallest,  if yes  go to mainpot. update status and sidepot,
+            *              else if second all in(check the bet chips per person more than least), update mianpot and  sidepot
+            *          if second all in go to side pot. least
+            *          if other player not enough money, he still can all in, but has side pot.
+            *      if check, go to next player
+            *       if raise ,cout player base chips and raise chips,and mainpot
+            *          pop out this player
+            *            push other player to queue
+            *
+            */
+
 
             // put other player to queue
             for (int i = 0; i < vp.size(); i++) {
-                q.push(vp.at(0));
+                q.push(vp.at(i));
             }
-
 
             //large bet
             int largeBet=blind*2;
             vector<int> allInList;
             int largeAllIn=0;
+            vector<Player> tmp;
+            vector<Player> tmpNext;
 
-            while (q.size() != 0) {
+            //pro flop
+            while (!q.empty()) {
                 int o;
+                cout<<endl;
                 cout << q.front().name << " please choose: " << endl;
-                //check if you can call, if chips more than largest of all in ,then you can call , if less, only can all in.
-                    for (int i = 0; i < vp.size(); i++) {
-                        if(vp.at(i).status=="allin"){
-                            allInList.push_back(vp.at(0).chips);
-                        }
-                        sort(allInList.begin(),allInList.end());
-                        largeAllIn=allInList.back();
-                    }
-                    if(q.front().chips>largeAllIn){
-                        cout << "1:Call \n2:Fold  \n3:Raise  \n4:All in\n";
-                    }else{
-                        cout << "2:Fold  \n4:All in\n";
-                    }
 
-                cin >> o;
+                    //check if you can call, if chips more than largest of all in ,then you can call , if less, only can all in.
+                        for (int i = 0; i < vp.size(); i++) {
+                            if(vp.at(i).status==allin){
+                                allInList.push_back(vp.at(0).chipsOnTable);
+                            }
+                        }
+                        if(allInList.size()>0) {
+                            sort(allInList.begin(), allInList.end());
+                            largeAllIn = allInList.back();
+                        }
+
+                        // if player call has option, else choose call or all in only
+                        if(q.front().chips>largeAllIn&&(q.front().chips+q.front().chipsOnTable)>largeBet){
+
+                                if(!q.front().name.compare(playername)) {
+                                    cout << "1:Call \n2:Fold  \n3:Raise  \n4:All in\n";
+                                    cin>>o;
+                                }else{
+                                    o=1;
+                                    cout<<q.front().name<<" choose : call"<<endl;
+                                }
+                            }else{
+                                if(!q.front().name.compare(playername)) {
+                                    cout << "2:Fold  \n4:All in\n";
+                                    cin>>o;
+                                }else{
+                                    o=4;
+                                    cout<<q.front().name<<" choose ALL in"<<endl;
+                                }
+                        }
+
+
                 switch (o) {
                     case 1: {
-                        //chips-largeBet
+                        //call will let player not in the queue you can only call once
+                        //bet=chips-largeBet
+                        mainPot+=largeBet-q.front().chipsOnTable; //add to mainpot
+                        q.front().chips=q.front().chips-(largeBet-q.front().chipsOnTable); //remove chips
+                        q.front().chipsOnTable=largeBet; // largeBet in the table
 
+                        //show info
+                        cout<<"mainPot: "<<mainPot<<endl;
+                        cout<<"chips: "<<q.front().chips<<endl;
+                        cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
 
-
+                        tmp.push_back(q.front());
+                        q.pop();
 
                         break;
                     }
-                }
+                    case 2:{
+                        q.front().status=fold;
+                        q.front().chipsOnTable=0;
+                        q.front().sidePot=0;
 
+                        //show info
+                        cout<<"mainPot: "<<mainPot<<endl;
+
+                        q.pop();
+                        break;
+
+                    }
+                    case 3:{
+                        int raiseData=0;
+
+                        cout<<"how much you want to raise?"<<endl;
+                        cin>>raiseData;
+                        if((raiseData+q.front().chipsOnTable)<largeBet) {
+                            cout<<"you need raise more than "<<(largeBet-q.front().chipsOnTable)<<endl;
+                            cout<<"how much you want to raise?"<<endl;
+                            cin>>raiseData;
+                        }
+                        mainPot+=raiseData;
+                        q.front().chipsOnTable=q.front().chipsOnTable+raiseData;
+                        q.front().chips=q.front().chips-raiseData;
+                        largeBet=q.front().chipsOnTable;
+                        //show info
+                        cout<<"mainPot: "<<mainPot<<endl;
+                        cout<<"chips: "<<q.front().chips<<endl;
+                        cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+                        // when raise other person need to go to queue
+
+                        q.pop();
+                        for(int i=0;i<tmp.size();i++){
+                            q.push(tmp.at(i));
+                        }
+                        break;
+                    }
+                    case 4:{
+
+                        int smallAllin;
+                        //side pot if all in > largebet,then other player in queue
+                        if((q.front().chipsOnTable+q.front().chips)>largeBet){
+                            mainPot+=q.front().chips;
+                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
+                            q.front().chips=0;
+                            q.front().status=allin;
+                            largeBet=q.front().chipsOnTable+q.front().chips;
+                            // show info
+                            cout<<"mainPot: "<<mainPot<<endl;
+                            cout<<"chips: "<<q.front().chips<<endl;
+                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+
+                            q.pop();
+                            for(int i=0;i<tmp.size();i++){
+                                if(tmp.at(i).status.compare(allin)) {
+                                    q.push(tmp.at(i));
+                                }
+                            }
+                        }else{
+                            //else all in < largebet
+                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
+                            q.front().chips=0;
+                            q.front().status=allin;
+                            mainPot=q.front().chipsOnTable*2;
+
+                            // show info
+                            cout<<"mainPot: "<<mainPot<<endl;
+                            cout<<"chips: "<<q.front().chips<<endl;
+                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+                            q.pop();
+                        }
+                    }
+                }
             }
 
-            //        *  player option,
-            //        *      if call
-            //        *          check if exist all in,if chips more than largest of all in ,then you can call , if less, only can all in.
-            //        *          check how much and count chips and mainpot,sidepot and show the info  go to next player in queue,if  queue=0 thus go to flop
-            //        *      if player fold, go to next player in queue,if queue=0 thus BB game done, count mainpot and chips add to player, show info.
-            //        *      if all in, push other player into queue, count the all in money for other player.
-            //        *          if first all
-            //        *              check if it is smallest,  if yes  go to mainpot. update status and sidepot,
-            //        *              else if second all in(check the bet chips per person more than least), update mianpot and  sidepot
-            //        *          if second all in go to side pot. least
-            //        *          if other player not enough money, he still can all in, but has side pot.
-            //        *      if check, go to next player
-            //        *       if raise ,cout player base chips and raise chips,and mainpot
-            //        *          pop out this player
-            //        *            push other player to queue
-            //        *  }
+
+
+            //Flop-round
+//            while (!q.empty()) {
+//                int o;
+//                cout<<endl;
+//                cout << q.front().name << " please choose: " << endl;
+//
+//                //check if you can call, if chips more than largest of all in ,then you can call , if less, only can all in.
+//                for (int i = 0; i < vp.size(); i++) {
+//                    if(vp.at(i).status==allin){
+//                        allInList.push_back(vp.at(0).chipsOnTable);
+//                    }
+//                }
+//                if(allInList.size()>0) {
+//                    sort(allInList.begin(), allInList.end());
+//                    largeAllIn = allInList.back();
+//                }
+//
+//                // if player call has option, else choose call or all in only
+//                if(q.front().chips>largeAllIn&&(q.front().chips+q.front().chipsOnTable)>largeBet){
+//
+//                    if(!q.front().name.compare(playername)) {
+//                        cout << "1:Call \n2:Fold  \n3:Raise  \n4:All in\n";
+//                        cin>>o;
+//                    }else{
+//                        o=1;
+//                        cout<<q.front().name<<" choose : call"<<endl;
+//                    }
+//                }else{
+//                    if(!q.front().name.compare(playername)) {
+//                        cout << "2:Fold  \n4:All in\n";
+//                        cin>>o;
+//                    }else{
+//                        o=4;
+//                        cout<<q.front().name<<" choose ALL in"<<endl;
+//                    }
+//                }
+//
+//
+//                switch (o) {
+//                    case 1: {
+//                        //call will let player not in the queue you can only call once
+//                        //bet=chips-largeBet
+//                        mainPot+=largeBet-q.front().chipsOnTable; //add to mainpot
+//                        q.front().chips=q.front().chips-(largeBet-q.front().chipsOnTable); //remove chips
+//                        q.front().chipsOnTable=largeBet; // largeBet in the table
+//
+//                        //show info
+//                        cout<<"mainPot: "<<mainPot<<endl;
+//                        cout<<"chips: "<<q.front().chips<<endl;
+//                        cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+//
+//                        tmp.push_back(q.front());
+//                        q.pop();
+//
+//                        break;
+//                    }
+//                    case 2:{
+//                        q.front().status=fold;
+//                        q.front().chipsOnTable=0;
+//                        q.front().sidePot=0;
+//
+//                        //show info
+//                        cout<<"mainPot: "<<mainPot<<endl;
+//
+//                        q.pop();
+//                        break;
+//
+//                    }
+//                    case 3:{
+//                        int raiseData=0;
+//
+//                        cout<<"how much you want to raise?"<<endl;
+//                        cin>>raiseData;
+//                        if((raiseData+q.front().chipsOnTable)<largeBet) {
+//                            cout<<"you need raise more than "<<(largeBet-q.front().chipsOnTable)<<endl;
+//                            cout<<"how much you want to raise?"<<endl;
+//                            cin>>raiseData;
+//                        }
+//                        mainPot+=raiseData;
+//                        q.front().chipsOnTable=q.front().chipsOnTable+raiseData;
+//                        q.front().chips=q.front().chips-raiseData;
+//                        largeBet=q.front().chipsOnTable;
+//                        //show info
+//                        cout<<"mainPot: "<<mainPot<<endl;
+//                        cout<<"chips: "<<q.front().chips<<endl;
+//                        cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+//                        // when raise other person need to go to queue
+//
+//                        q.pop();
+//                        for(int i=0;i<tmp.size();i++){
+//                            q.push(tmp.at(i));
+//                        }
+//                        break;
+//                    }
+//                    case 4:{
+//
+//                        int smallAllin;
+//                        //side pot if all in > largebet,then other player in queue
+//                        if((q.front().chipsOnTable+q.front().chips)>largeBet){
+//                            mainPot+=q.front().chips;
+//                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
+//                            q.front().chips=0;
+//                            q.front().status=allin;
+//                            largeBet=q.front().chipsOnTable+q.front().chips;
+//                            // show info
+//                            cout<<"mainPot: "<<mainPot<<endl;
+//                            cout<<"chips: "<<q.front().chips<<endl;
+//                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+//
+//                            q.pop();
+//                            for(int i=0;i<tmp.size();i++){
+//                                if(tmp.at(i).status.compare(allin)) {
+//                                    q.push(tmp.at(i));
+//                                }
+//                            }
+//                        }else{
+//                            //else all in < largebet
+//                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
+//                            q.front().chips=0;
+//                            q.front().status=allin;
+//                            mainPot=q.front().chipsOnTable*2;
+//
+//                            // show info
+//                            cout<<"mainPot: "<<mainPot<<endl;
+//                            cout<<"chips: "<<q.front().chips<<endl;
+//                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+//                            q.pop();
+//                        }
+//                    }
+//                }
+//            }
 
 
 
 
 
-//flop show three cards on the table
+
+
+
 //Flop-round
 //SB can raise and call, Fold, all in.
 // if call will go to Turn.
@@ -377,53 +628,53 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
 
 //if not empty keep call. If player fold or out of money, he will push out from queue.
-            list<Player> maplist;
-            int raise = 0;
-            while (q.size() > 0) {
-                int o;
-                cout << q.front().name << " please choose: " << endl;
-                cout << "1:Call \n2:Fold  \n3:Raise  \n4:All in\n";
-                cin >> o;
-                switch (o) {
-                    case 1: {
-                        if (raise == 0) {
-                            q.front().chips = q.front().chips - blind;
-                            mainPot += blind;
-                            maplist.push_back(q.front());
-                            q.pop();
-                        } else {
-                            q.front().chips = q.front().chips - raise;
-                            mainPot += raise;
-                            maplist.push_back(q.front());
-                            q.pop();
-                        }
-                        break;
-                    }
-                    case 2: {
-                        cout << "this turn finish, shuffer and play again. " << endl;
-                        break;
-                    }
-                    case 3: {
-                        cout << " how much you raise" << endl;
-                        cin >> raise;
-                        q.front().chips = q.front().chips - raise;
-                        mainPot += raise;
-                        maplist.push_back(q.front());
-                        q.pop();
-                        q.push(maplist.front());
-                        break;
-                    }
-                    case 4: {
-                        break;
-                    }
-
-
-                }
-            }
-
-//case 2
-            break;
-        }
+//            list<Player> maplist;
+//            int raise = 0;
+//            while (q.size() > 0) {
+//                int o;
+//                cout << q.front().name << " please choose: " << endl;
+//                cout << "1:Call \n2:Fold  \n3:Raise  \n4:All in\n";
+//                cin >> o;
+//                switch (o) {
+//                    case 1: {
+//                        if (raise == 0) {
+//                            q.front().chips = q.front().chips - blind;
+//                            mainPot += blind;
+//                            maplist.push_back(q.front());
+//                            q.pop();
+//                        } else {
+//                            q.front().chips = q.front().chips - raise;
+//                            mainPot += raise;
+//                            maplist.push_back(q.front());
+//                            q.pop();
+//                        }
+//                        break;
+//                    }
+//                    case 2: {
+//                        cout << "this turn finish, shuffer and play again. " << endl;
+//                        break;
+//                    }
+//                    case 3: {
+//                        cout << " how much you raise" << endl;
+//                        cin >> raise;
+//                        q.front().chips = q.front().chips - raise;
+//                        mainPot += raise;
+//                        maplist.push_back(q.front());
+//                        q.pop();
+//                        q.push(maplist.front());
+//                        break;
+//                    }
+//                    case 4: {
+//                        break;
+//                    }
+//
+//
+//                }
+//            }
+//
+////case 2
+//            break;
+        }//end while pre-flop
     }
 
 
