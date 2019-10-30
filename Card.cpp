@@ -1,5 +1,5 @@
 //
-// Created by william  on 10/20/19.
+// Created by William  on 10/20/19.
 //
 
 //assigns the 52 cards to deck

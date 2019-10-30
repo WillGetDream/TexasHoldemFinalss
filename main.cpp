@@ -1,5 +1,5 @@
 //
-// Created by william   on 10/20/19.
+// Created by William   on 10/20/19.
 //
 
 
@@ -30,7 +30,7 @@ int main() {
     //blind=10;
     cout <<FBLU( "Please Enter the name: ")<<endl;
     cin>>player.name;
-    //player.name="william";
+    //player.name="William";
     cout <<FBLU( "How many chips do you need to buy?(600 or more) ")<<endl;
     cin>>player.chips;
     //player.chips=600;
