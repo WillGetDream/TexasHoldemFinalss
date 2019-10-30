@@ -302,6 +302,7 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
             vector<int> allInList;
             int largeAllIn=0;
             vector<Player> tmp;
+            vector<Player> allInTmp;
             vector<Player> tmpNext;
 
             //pro flop
@@ -398,41 +399,57 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         }
                         break;
                     }
-                    case 4:{
+                    case 4: {
+
+                        if(!q.front().status.compare(allin)){
+                            q.pop();
+                            break;
+                        }
 
                         int smallAllin;
                         //side pot if all in > largebet,then other player in queue
-                        if((q.front().chipsOnTable+q.front().chips)>largeBet){
-                            mainPot+=q.front().chips;
-                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
-                            q.front().chips=0;
-                            q.front().status=allin;
-                            largeBet=q.front().chipsOnTable+q.front().chips;
+                        if ((q.front().chipsOnTable + q.front().chips) > largeBet) {
+                            mainPot += q.front().chips;
+                            q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
+                            q.front().chips = 0;
+                            q.front().status = allin;
+                            largeBet = q.front().chipsOnTable + q.front().chips;
                             // show info
-                            cout<<"mainPot: "<<mainPot<<endl;
-                            cout<<"chips: "<<q.front().chips<<endl;
-                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+                            cout << "mainPot: " << mainPot << endl;
+                            cout << "chips: " << q.front().chips << endl;
+                            cout << "chipsOnTable: " << q.front().chipsOnTable << endl;
 
+                            //push to all in vector
+                            allInTmp.push_back(q.front());
+                            //not call at all
                             q.pop();
-                            for(int i=0;i<tmp.size();i++){
-                                if(tmp.at(i).status.compare(allin)) {
+                            //push other to queue
+                            for (int i = 0; i < tmp.size(); i++) {
+                                if (tmp.at(i).status.compare(allin)) {
                                     q.push(tmp.at(i));
                                 }
                             }
-                        }else{
+                        } else {
                             //else all in < largebet
-                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
-                            q.front().chips=0;
-                            q.front().status=allin;
-                            mainPot=q.front().chipsOnTable*2;
+                            q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
+                            q.front().chips = 0;
+                            q.front().status = allin;
+                            mainPot+=q.front().chipsOnTable;
+
 
                             // show info
-                            cout<<"mainPot: "<<mainPot<<endl;
-                            cout<<"chips: "<<q.front().chips<<endl;
-                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+                            cout << "mainPot: " << mainPot << endl;
+                            cout << "chips: " << q.front().chips << endl;
+                            cout << "chipsOnTable: " << q.front().chipsOnTable << endl;
+
+                            //push to all in vector
+                            allInTmp.push_back(q.front());
+                            //not call at all
                             q.pop();
                         }
+                        break;
                     }
+
                 }
             }
 
@@ -501,8 +518,6 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
                 switch (o) {
                     case 1: {
-
-
                         //call will let player not in the queue you can only call once
                         //bet=chips-largeBet
                         mainPot+=largeBet-q.front().chipsOnTable; //add to mainpot
@@ -557,41 +572,56 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         }
                         break;
                     }
-                    case 4:{
-
+                    case 4: {
+                        if(!q.front().status.compare(allin)){
+                            q.pop();
+                            break;
+                        }
                         int smallAllin;
                         //side pot if all in > largebet,then other player in queue
-                        if((q.front().chipsOnTable+q.front().chips)>largeBet){
-                            mainPot+=q.front().chips;
-                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
-                            q.front().chips=0;
-                            q.front().status=allin;
-                            largeBet=q.front().chipsOnTable+q.front().chips;
+                        if ((q.front().chipsOnTable + q.front().chips) > largeBet) {
+                            mainPot += q.front().chips;
+                            q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
+                            q.front().chips = 0;
+                            q.front().status = allin;
+                            largeBet = q.front().chipsOnTable + q.front().chips;
                             // show info
-                            cout<<"mainPot: "<<mainPot<<endl;
-                            cout<<"chips: "<<q.front().chips<<endl;
-                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+                            cout << "mainPot: " << mainPot << endl;
+                            cout << "chips: " << q.front().chips << endl;
+                            cout << "chipsOnTable: " << q.front().chipsOnTable << endl;
 
+                            //push to all in vector
+                            allInTmp.push_back(q.front());
+                            //not call at all
                             q.pop();
-                            for(int i=0;i<tmp.size();i++){
-                                if(tmp.at(i).status.compare(allin)) {
+                            //push other to queue
+                            for (int i = 0; i < tmp.size(); i++) {
+                                if (tmp.at(i).status.compare(allin)) {
                                     q.push(tmp.at(i));
                                 }
                             }
-                        }else{
+                        } else {
                             //else all in < largebet
-                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
-                            q.front().chips=0;
-                            q.front().status=allin;
-                            mainPot=q.front().chipsOnTable*2;
+                            mainPot+=q.front().chips;
+                            q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
+                            q.front().chips = 0;
+                            q.front().status = allin;
+
+
 
                             // show info
-                            cout<<"mainPot: "<<mainPot<<endl;
-                            cout<<"chips: "<<q.front().chips<<endl;
-                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+                            cout << "mainPot: " << mainPot << endl;
+                            cout << "chips: " << q.front().chips << endl;
+                            cout << "chipsOnTable: " << q.front().chipsOnTable << endl;
+
+                            //push to all in vector
+                            allInTmp.push_back(q.front());
+                            //not call at all
                             q.pop();
                         }
+                        break;
                     }
+
                 }
             }
 
@@ -670,8 +700,6 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
                 switch (o) {
                     case 1: {
-
-
                         //call will let player not in the queue you can only call once
                         //bet=chips-largeBet
                         mainPot+=largeBet-q.front().chipsOnTable; //add to mainpot
@@ -726,41 +754,55 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         }
                         break;
                     }
-                    case 4:{
-
+                    case 4: {
+                        if(!q.front().status.compare(allin)){
+                            q.pop();
+                            break;
+                        }
                         int smallAllin;
                         //side pot if all in > largebet,then other player in queue
-                        if((q.front().chipsOnTable+q.front().chips)>largeBet){
-                            mainPot+=q.front().chips;
-                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
-                            q.front().chips=0;
-                            q.front().status=allin;
-                            largeBet=q.front().chipsOnTable+q.front().chips;
+                        if ((q.front().chipsOnTable + q.front().chips) > largeBet) {
+                            mainPot += q.front().chips;
+                            q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
+                            q.front().chips = 0;
+                            q.front().status = allin;
+                            largeBet = q.front().chipsOnTable + q.front().chips;
                             // show info
-                            cout<<"mainPot: "<<mainPot<<endl;
-                            cout<<"chips: "<<q.front().chips<<endl;
-                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+                            cout << "mainPot: " << mainPot << endl;
+                            cout << "chips: " << q.front().chips << endl;
+                            cout << "chipsOnTable: " << q.front().chipsOnTable << endl;
 
+                            //push to all in vector
+                            allInTmp.push_back(q.front());
+                            //not call at all
                             q.pop();
-                            for(int i=0;i<tmp.size();i++){
-                                if(tmp.at(i).status.compare(allin)) {
+                            //push other to queue
+                            for (int i = 0; i < tmp.size(); i++) {
+                                if (tmp.at(i).status.compare(allin)) {
                                     q.push(tmp.at(i));
                                 }
                             }
-                        }else{
+                        } else {
                             //else all in < largebet
-                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
-                            q.front().chips=0;
-                            q.front().status=allin;
-                            mainPot=q.front().chipsOnTable*2;
+                            q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
+                            q.front().chips = 0;
+                            q.front().status = allin;
+                            mainPot+=q.front().chipsOnTable;
+
 
                             // show info
-                            cout<<"mainPot: "<<mainPot<<endl;
-                            cout<<"chips: "<<q.front().chips<<endl;
-                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+                            cout << "mainPot: " << mainPot << endl;
+                            cout << "chips: " << q.front().chips << endl;
+                            cout << "chipsOnTable: " << q.front().chipsOnTable << endl;
+
+                            //push to all in vector
+                            allInTmp.push_back(q.front());
+                            //not call at all
                             q.pop();
                         }
+                        break;
                     }
+
                 }
             }
 
@@ -840,8 +882,6 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
                 switch (o) {
                     case 1: {
-
-
                         //call will let player not in the queue you can only call once
                         //bet=chips-largeBet
                         mainPot+=largeBet-q.front().chipsOnTable; //add to mainpot
@@ -896,47 +936,68 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         }
                         break;
                     }
-                    case 4:{
-
+                    case 4: {
+                        if(!q.front().status.compare(allin)){
+                            q.pop();
+                            break;
+                        }
                         int smallAllin;
                         //side pot if all in > largebet,then other player in queue
-                        if((q.front().chipsOnTable+q.front().chips)>largeBet){
-                            mainPot+=q.front().chips;
-                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
-                            q.front().chips=0;
-                            q.front().status=allin;
-                            largeBet=q.front().chipsOnTable+q.front().chips;
+                        if ((q.front().chipsOnTable + q.front().chips) > largeBet) {
+                            mainPot += q.front().chips;
+                            q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
+                            q.front().chips = 0;
+                            q.front().status = allin;
+                            largeBet = q.front().chipsOnTable + q.front().chips;
                             // show info
-                            cout<<"mainPot: "<<mainPot<<endl;
-                            cout<<"chips: "<<q.front().chips<<endl;
-                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+                            cout << "mainPot: " << mainPot << endl;
+                            cout << "chips: " << q.front().chips << endl;
+                            cout << "chipsOnTable: " << q.front().chipsOnTable << endl;
 
+                            //push to all in vector
+                            allInTmp.push_back(q.front());
+                            //not call at all
                             q.pop();
-                            for(int i=0;i<tmp.size();i++){
-                                if(tmp.at(i).status.compare(allin)) {
+                            //push other to queue
+                            for (int i = 0; i < tmp.size(); i++) {
+                                if (tmp.at(i).status.compare(allin)) {
                                     q.push(tmp.at(i));
                                 }
                             }
-                        }else{
+                        } else {
                             //else all in < largebet
-                            q.front().chipsOnTable=q.front().chipsOnTable+q.front().chips;
-                            q.front().chips=0;
-                            q.front().status=allin;
-                            mainPot=q.front().chipsOnTable*2;
+                            q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
+                            q.front().chips = 0;
+                            q.front().status = allin;
+                            mainPot+=q.front().chipsOnTable;
+
 
                             // show info
-                            cout<<"mainPot: "<<mainPot<<endl;
-                            cout<<"chips: "<<q.front().chips<<endl;
-                            cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
+                            cout << "mainPot: " << mainPot << endl;
+                            cout << "chips: " << q.front().chips << endl;
+                            cout << "chipsOnTable: " << q.front().chipsOnTable << endl;
+
+                            //push to all in vector
+                            allInTmp.push_back(q.front());
+                            //not call at all
                             q.pop();
                         }
+                        break;
                     }
+
                 }
             }
 
             cout<<endl;
             cout<<"Show Player card on the table"<<endl;
             cout<<endl;
+
+            if(allInTmp.size()>0){
+                tmp.clear();
+                for(int i=0;i<tmp.size();i++){
+                    tmp.push_back(allInTmp.at(i));
+                }
+            }
 
             for(int i=0;i<tmp.size();i++){
                 cout<<endl;
@@ -964,8 +1025,12 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
             for(int i=0;i<tmp.size();i++){
                 if(!winner.name.compare(tmp.at(i).name)){
-                    tmp.at(i).chips+=mainPot;
-                    cout<<"winner "<<tmp.at(i).name<<"chips is :"<<tmp.at(i).chips<<endl;
+                    if(tmp.at(i).chipsOnTable<(mainPot/2)){
+                        tmp.at(i).chips=tmp.at(i).chipsOnTable*2;
+                    }else {
+                        tmp.at(i).chips = mainPot;
+                    }
+                    cout<<"winner "<<tmp.at(i).name<<" chips is :"<<tmp.at(i).chips<<endl;
                 }
             }
 
@@ -1574,7 +1639,6 @@ Player Utils::calculateWins(vector<Player> p,Card* cardtab,int size){
         int k=5;
 
         Card a[n];
-        DeckOfCards deck;
         vector<int> values;
 
         bool *visited = new bool[n];
@@ -1593,14 +1657,18 @@ Player Utils::calculateWins(vector<Player> p,Card* cardtab,int size){
             Card cardsary[5];
             for(int j=0;j<5;j++){
                 cardsary[j]=vv.at(i).at(j);
+                cout<<cardsary[j].print()<<"---->";
             }
-            values.push_back(valueHand(cardsary,5));
+            int s=valueHand(cardsary,5);
+            cout<<i<<"--->"<<s<<endl;
+            values.push_back(s);
         }
         //get max
         sort(values.begin(),values.end(),greater<int>());
         cout<<endl;
         cout<<"best value of hands: "<<values.front()<<endl;
         p.at(i).valueInHand=values.front();
+        vv.clear();
         delete[] visited;
     }
     if(p.at(0).valueInHand>p.at(1).valueInHand){
