@@ -12,7 +12,7 @@ using namespace std;
 DeckOfCards::DeckOfCards()
 {
 //put all the face values in an array as strings
-    string faces[] = {"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"};
+    string faces[] = {"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
     string suits[] = {"Heart", "Diamond", "Club", "Spade"};
 
     for(int count = 0; count < 52; count++)
@@ -49,7 +49,9 @@ stack<Card> DeckOfCards::shuffle()
 
 Card DeckOfCards::dealCard()
 {
+
     Card card=deckList.top();
     deckList.pop();
     return card;
 }
+
