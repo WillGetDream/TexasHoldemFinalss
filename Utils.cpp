@@ -25,6 +25,8 @@
 #define fold "fold"
 #define active "active"
 #define allin "allin"
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -356,9 +358,19 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         cout<<"chips: "<<q.front().chips<<endl;
                         cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
 
-                        tmp.push_back(q.front());
-                        q.pop();
+                        //add to tmp if exist not add ,tmp for next loop
+                            int b=0;
+                            for(int i=0;i<tmp.size();i++){
+                                if(!q.front().name.compare(tmp.at(i).name)){
+                                    b++;
+                                }
+                            }
+                            if(b<1){
+                                tmp.push_back(q.front());
+                            }
 
+                        // pop from queue after action
+                        q.pop();
                         break;
                     }
                     case 2:{
@@ -368,10 +380,25 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
                         //show info
                         cout<<"mainPot: "<<mainPot<<endl;
-
                         q.pop();
-                        break;
+                        //find the winner
+                        for(int i=0;i<tmp.size();i++){
+                            if(tmp.at(i).name.compare(playername)){
+                                cout<<tmp.at(i).name<<" Win the game"<<endl;
+                            }
+                        }
+                        for(int i=0;i<q.size();i++){
+                            if(q.front().name.compare(playername)){
+                                cout<<q.front().name<<" Win the game"<<endl;
+                            }
+                        }
+                        cout<<"game over! please restart the game!"<<endl;
+                        while(1){
+                            getchar();
+                        }
 
+
+                        break;
                     }
                     case 3:{
                         int raiseData=0;
@@ -392,6 +419,17 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         cout<<"chips: "<<q.front().chips<<endl;
                         cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
                         // when raise other person need to go to queue
+
+                        //add to tmp if exist not add ,tmp for next loop
+                        int b=0;
+                        for(int i=0;i<tmp.size();i++){
+                            if(!q.front().name.compare(tmp.at(i).name)){
+                                b++;
+                            }
+                        }
+                        if(b<1){
+                            tmp.push_back(q.front());
+                        }
 
                         q.pop();
                         for(int i=0;i<tmp.size();i++){
@@ -431,10 +469,10 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                             }
                         } else {
                             //else all in < largebet
+                            mainPot+=q.front().chips;
                             q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
                             q.front().chips = 0;
                             q.front().status = allin;
-                            mainPot+=q.front().chipsOnTable;
 
 
                             // show info
@@ -529,9 +567,19 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         cout<<"chips: "<<q.front().chips<<endl;
                         cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
 
-                        tmp.push_back(q.front());
-                        q.pop();
+                        //add to tmp if exist not add ,tmp for next loop
+                        int b=0;
+                        for(int i=0;i<tmp.size();i++){
+                            if(!q.front().name.compare(tmp.at(i).name)){
+                                b++;
+                            }
+                        }
+                        if(b<1){
+                            tmp.push_back(q.front());
+                        }
 
+                        // pop from queue after action
+                        q.pop();
                         break;
                     }
                     case 2:{
@@ -541,10 +589,25 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
                         //show info
                         cout<<"mainPot: "<<mainPot<<endl;
-
                         q.pop();
-                        break;
+                        //find the winner
+                        for(int i=0;i<tmp.size();i++){
+                            if(tmp.at(i).name.compare(playername)){
+                                cout<<tmp.at(i).name<<" Win the game"<<endl;
+                            }
+                        }
+                        for(int i=0;i<q.size();i++){
+                            if(q.front().name.compare(playername)){
+                                cout<<q.front().name<<" Win the game"<<endl;
+                            }
+                        }
+                        cout<<"game over! please restart the game!"<<endl;
+                        while(1){
+                            getchar();
+                        }
 
+
+                        break;
                     }
                     case 3:{
                         int raiseData=0;
@@ -566,6 +629,17 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
                         // when raise other person need to go to queue
 
+                        //add to tmp if exist not add ,tmp for next loop
+                        int b=0;
+                        for(int i=0;i<tmp.size();i++){
+                            if(!q.front().name.compare(tmp.at(i).name)){
+                                b++;
+                            }
+                        }
+                        if(b<1){
+                            tmp.push_back(q.front());
+                        }
+
                         q.pop();
                         for(int i=0;i<tmp.size();i++){
                             q.push(tmp.at(i));
@@ -573,10 +647,12 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         break;
                     }
                     case 4: {
+
                         if(!q.front().status.compare(allin)){
                             q.pop();
                             break;
                         }
+
                         int smallAllin;
                         //side pot if all in > largebet,then other player in queue
                         if ((q.front().chipsOnTable + q.front().chips) > largeBet) {
@@ -608,7 +684,6 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                             q.front().status = allin;
 
 
-
                             // show info
                             cout << "mainPot: " << mainPot << endl;
                             cout << "chips: " << q.front().chips << endl;
@@ -624,7 +699,6 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
                 }
             }
-
 
             /*
              *
@@ -711,9 +785,19 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         cout<<"chips: "<<q.front().chips<<endl;
                         cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
 
-                        tmp.push_back(q.front());
-                        q.pop();
+                        //add to tmp if exist not add ,tmp for next loop
+                        int b=0;
+                        for(int i=0;i<tmp.size();i++){
+                            if(!q.front().name.compare(tmp.at(i).name)){
+                                b++;
+                            }
+                        }
+                        if(b<1){
+                            tmp.push_back(q.front());
+                        }
 
+                        // pop from queue after action
+                        q.pop();
                         break;
                     }
                     case 2:{
@@ -723,10 +807,25 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
                         //show info
                         cout<<"mainPot: "<<mainPot<<endl;
-
                         q.pop();
-                        break;
+                        //find the winner
+                        for(int i=0;i<tmp.size();i++){
+                            if(tmp.at(i).name.compare(playername)){
+                                cout<<tmp.at(i).name<<" Win the game"<<endl;
+                            }
+                        }
+                        for(int i=0;i<q.size();i++){
+                            if(q.front().name.compare(playername)){
+                                cout<<q.front().name<<" Win the game"<<endl;
+                            }
+                        }
+                        cout<<"game over! please restart the game!"<<endl;
+                        while(1){
+                            getchar();
+                        }
 
+
+                        break;
                     }
                     case 3:{
                         int raiseData=0;
@@ -748,6 +847,17 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
                         // when raise other person need to go to queue
 
+                        //add to tmp if exist not add ,tmp for next loop
+                        int b=0;
+                        for(int i=0;i<tmp.size();i++){
+                            if(!q.front().name.compare(tmp.at(i).name)){
+                                b++;
+                            }
+                        }
+                        if(b<1){
+                            tmp.push_back(q.front());
+                        }
+
                         q.pop();
                         for(int i=0;i<tmp.size();i++){
                             q.push(tmp.at(i));
@@ -755,10 +865,12 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         break;
                     }
                     case 4: {
+
                         if(!q.front().status.compare(allin)){
                             q.pop();
                             break;
                         }
+
                         int smallAllin;
                         //side pot if all in > largebet,then other player in queue
                         if ((q.front().chipsOnTable + q.front().chips) > largeBet) {
@@ -784,10 +896,10 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                             }
                         } else {
                             //else all in < largebet
+                            mainPot+=q.front().chips;
                             q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
                             q.front().chips = 0;
                             q.front().status = allin;
-                            mainPot+=q.front().chipsOnTable;
 
 
                             // show info
@@ -805,7 +917,6 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
                 }
             }
-
 
 
 
@@ -893,9 +1004,19 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         cout<<"chips: "<<q.front().chips<<endl;
                         cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
 
-                        tmp.push_back(q.front());
-                        q.pop();
+                        //add to tmp if exist not add ,tmp for next loop
+                        int b=0;
+                        for(int i=0;i<tmp.size();i++){
+                            if(!q.front().name.compare(tmp.at(i).name)){
+                                b++;
+                            }
+                        }
+                        if(b<1){
+                            tmp.push_back(q.front());
+                        }
 
+                        // pop from queue after action
+                        q.pop();
                         break;
                     }
                     case 2:{
@@ -905,10 +1026,25 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
 
                         //show info
                         cout<<"mainPot: "<<mainPot<<endl;
-
                         q.pop();
-                        break;
+                        //find the winner
+                        for(int i=0;i<tmp.size();i++){
+                            if(tmp.at(i).name.compare(playername)){
+                                cout<<tmp.at(i).name<<" Win the game"<<endl;
+                            }
+                        }
+                        for(int i=0;i<q.size();i++){
+                            if(q.front().name.compare(playername)){
+                                cout<<q.front().name<<" Win the game"<<endl;
+                            }
+                        }
+                        cout<<"game over! please restart the game!"<<endl;
+                        while(1){
+                            getchar();
+                        }
 
+
+                        break;
                     }
                     case 3:{
                         int raiseData=0;
@@ -930,6 +1066,17 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         cout<<"chipsOnTable: "<<q.front().chipsOnTable<<endl;
                         // when raise other person need to go to queue
 
+                        //add to tmp if exist not add ,tmp for next loop
+                        int b=0;
+                        for(int i=0;i<tmp.size();i++){
+                            if(!q.front().name.compare(tmp.at(i).name)){
+                                b++;
+                            }
+                        }
+                        if(b<1){
+                            tmp.push_back(q.front());
+                        }
+
                         q.pop();
                         for(int i=0;i<tmp.size();i++){
                             q.push(tmp.at(i));
@@ -937,10 +1084,12 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         break;
                     }
                     case 4: {
+
                         if(!q.front().status.compare(allin)){
                             q.pop();
                             break;
                         }
+
                         int smallAllin;
                         //side pot if all in > largebet,then other player in queue
                         if ((q.front().chipsOnTable + q.front().chips) > largeBet) {
@@ -966,10 +1115,10 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                             }
                         } else {
                             //else all in < largebet
+                            mainPot+=q.front().chips;
                             q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
                             q.front().chips = 0;
                             q.front().status = allin;
-                            mainPot+=q.front().chipsOnTable;
 
 
                             // show info
@@ -993,8 +1142,7 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
             cout<<endl;
 
             if(allInTmp.size()>0){
-                tmp.clear();
-                for(int i=0;i<tmp.size();i++){
+                for(int i=0;i<allInTmp.size();i++){
                     tmp.push_back(allInTmp.at(i));
                 }
             }
@@ -1021,14 +1169,14 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
             if(winner.name.empty()){
                 cout<<"no one winner!"<<endl;
             }
-            cout<<"winer is:  "<<winner.name<<endl;
+            cout<<"winner is:  "<<winner.name<<endl;
 
             for(int i=0;i<tmp.size();i++){
                 if(!winner.name.compare(tmp.at(i).name)){
                     if(tmp.at(i).chipsOnTable<(mainPot/2)){
                         tmp.at(i).chips=tmp.at(i).chipsOnTable*2;
                     }else {
-                        tmp.at(i).chips = mainPot;
+                        tmp.at(i).chips = tmp.at(i).chips +mainPot;
                     }
                     cout<<"winner "<<tmp.at(i).name<<" chips is :"<<tmp.at(i).chips<<endl;
                 }
