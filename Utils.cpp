@@ -381,6 +381,8 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
 
                         //show info
                         cout << "mainPot: " << mainPot << endl;
+                        Player rePy;
+                        rePy=q.front();
                         q.pop();
                         //find the winner
                         for (int i = 0; i < tmp.size(); i++) {
@@ -394,11 +396,7 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
                             }
                         }
                         cout << "game over! please restart the game!" << endl;
-                        while (1) {
-                            getchar();
-                        }
-
-
+                        return rePy;
                         break;
                     }
                     case 3: {
@@ -441,7 +439,7 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
                     case 4: {
 //                        cout<<"qsize-----"<<q.size();
 //                        cout<<"qname"<<q.front().name<<q.front().status;
-//                        cout<<"compare---->"<<q.front().status.compare(allin);
+                        cout<<" pro loop before q compare---->"<<q.front().status<<endl;
 
                         if (!q.front().status.compare(allin)) {
                             q.pop();
@@ -468,12 +466,17 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
                             q.pop();
                             //push other to queue
                             for (int i = 0; i < tmp.size(); i++) {
+                                cout<<"----tmp----->"<<tmp.at(i).name<<endl;
+
                                 if (tmp.at(i).status.compare(allin)) {
                                     q.push(tmp.at(i));
+
                                 }
+
                             }
                         } else {
                             //else all in < largebet
+
                             mainPot += q.front().chips;
                             q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
                             q.front().chips = 0;
@@ -487,8 +490,18 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
 
                             //push to all in vector
                             allInTmp.push_back(q.front());
+
+                            //updated status for tmp
+                            for (int i = 0; i < tmp.size(); i++) {
+                                if(q.front().name==tmp.at(i).name){
+                                    tmp.at(i).status=allin;
+                                }
+
+                            }
+
                             //not call at all
                             q.pop();
+
                         }
                         break;
                     }
@@ -510,12 +523,18 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
             //process order sb-bb and put them to the queue
             for (int i = 0; i < tmp.size(); i++) {
                 if (tmp.at(i).position == position.SB) {
-                    q.push(tmp.at(i));
+                    //cout<<"----tmp----middle-status-->"<<tmp.at(i).status<<endl;
+                    if(tmp.at(i).status!=allin){
+                        q.push(tmp.at(i));
+                    }
                 }
             }
             for (int i = 0; i < tmp.size(); i++) {
                 if (tmp.at(i).position == position.BB) {
-                    q.push(tmp.at(i));
+
+                    if(tmp.at(i).status!=allin) {
+                        q.push(tmp.at(i));
+                    }
                 }
             }
             tmp.clear();
@@ -594,6 +613,8 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
 
                         //show info
                         cout << "mainPot: " << mainPot << endl;
+                        Player rePy;
+                        rePy=q.front();
                         q.pop();
                         //find the winner
                         for (int i = 0; i < tmp.size(); i++) {
@@ -607,9 +628,8 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
                             }
                         }
                         cout << "game over! please restart the game!" << endl;
-                        while (1) {
-                            getchar();
-                        }
+                        return rePy;
+                        break;
 
 
                         break;
@@ -667,7 +687,7 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
                             q.front().chipsOnTable = q.front().chipsOnTable + q.front().chips;
                             q.front().chips = 0;
                             q.front().status = allin;
-                            cout << "status----" << q.front().status;
+                            //cout << "status----" << q.front().status;
 
                             largeBet = q.front().chipsOnTable + q.front().chips;
                             // show info
@@ -700,6 +720,15 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
 
                             //push to all in vector
                             allInTmp.push_back(q.front());
+
+                            //updated status for tmp
+                            for (int i = 0; i < tmp.size(); i++) {
+                                if(q.front().name==tmp.at(i).name){
+                                    tmp.at(i).status=allin;
+                                }
+
+                            }
+
                             //not call at all
                             q.pop();
                         }
@@ -727,12 +756,18 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
             //process order sb-bb and put them to the queue
             for (int i = 0; i < tmp.size(); i++) {
                 if (tmp.at(i).position == position.SB) {
-                    q.push(tmp.at(i));
+                    if(tmp.at(i).status!=allin) {
+
+                        q.push(tmp.at(i));
+                    }
                 }
             }
             for (int i = 0; i < tmp.size(); i++) {
                 if (tmp.at(i).position == position.BB) {
-                    q.push(tmp.at(i));
+                    if(tmp.at(i).status!=allin) {
+
+                        q.push(tmp.at(i));
+                    }
                 }
             }
             tmp.clear();
@@ -816,6 +851,8 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
 
                         //show info
                         cout << "mainPot: " << mainPot << endl;
+                        Player rePy;
+                        rePy=q.front();
                         q.pop();
                         //find the winner
                         for (int i = 0; i < tmp.size(); i++) {
@@ -829,9 +866,8 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
                             }
                         }
                         cout << "game over! please restart the game!" << endl;
-                        while (1) {
-                            getchar();
-                        }
+                        return rePy;
+                        break;
 
 
                         break;
@@ -918,6 +954,15 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
 
                             //push to all in vector
                             allInTmp.push_back(q.front());
+
+                            //updated status for tmp
+                            for (int i = 0; i < tmp.size(); i++) {
+                                if(q.front().name==tmp.at(i).name){
+                                    tmp.at(i).status=allin;
+                                }
+
+                            }
+
                             //not call at all
                             q.pop();
                         }
@@ -946,12 +991,18 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
             //process order sb-bb and put them to the queue
             for (int i = 0; i < tmp.size(); i++) {
                 if (tmp.at(i).position == position.SB) {
-                    q.push(tmp.at(i));
+                    if(tmp.at(i).status!=allin) {
+
+                        q.push(tmp.at(i));
+                    }
                 }
             }
             for (int i = 0; i < tmp.size(); i++) {
                 if (tmp.at(i).position == position.BB) {
-                    q.push(tmp.at(i));
+                    if(tmp.at(i).status!=allin) {
+
+                        q.push(tmp.at(i));
+                    }
                 }
             }
             tmp.clear();
@@ -1035,6 +1086,8 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
 
                         //show info
                         cout << "mainPot: " << mainPot << endl;
+                        Player rePy;
+                        rePy=q.front();
                         q.pop();
                         //find the winner
                         for (int i = 0; i < tmp.size(); i++) {
@@ -1048,9 +1101,8 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
                             }
                         }
                         cout << "game over! please restart the game!" << endl;
-                        while (1) {
-                            getchar();
-                        }
+                        return rePy;
+                        break;
 
 
                         break;
@@ -1137,6 +1189,15 @@ Player Utils::processflop(map<Player *, string> players, DeckOfCards *deck, int 
 
                             //push to all in vector
                             allInTmp.push_back(q.front());
+
+                            //updated status for tmp
+                            for (int i = 0; i < tmp.size(); i++) {
+                                if(q.front().name==tmp.at(i).name){
+                                    tmp.at(i).status=allin;
+                                }
+
+                            }
+
                             //not call at all
                             q.pop();
                         }
