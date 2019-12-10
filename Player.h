@@ -17,7 +17,7 @@ public:
     int chipsOnTable;
     string position;
     Card card[2];
-    string status; //fold, active, allin
+    string status; //fold, active, allin 88
     int sidePot;
     int valueInHand;
 

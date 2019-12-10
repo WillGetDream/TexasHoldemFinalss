@@ -13,6 +13,8 @@
 #include "DeckOfCards.h"
 #include <queue>
 #include "maze.h"
+#include <string>
+#include "hash.h"
 using namespace std;
 
 class Utils {
@@ -39,7 +41,7 @@ public:
     map<string, int> getRandomPlayers(int );                 //get players and chips
     set<string> RandomNames(int );                     //read file and get random name
     map<Player*,string> getRandomPosition(map<string,int> );           //get getRandomPosition
-    map<string,Player*> processOrderByPreflop(map<Player*,string> players,DeckOfCards* deck,int blind,string playername);  //proess orderby pre flop,get cards ,return queue
+    Player processflop(map<Player*,string> players,DeckOfCards* deck,int blind,string playername);  //proess orderby pre flop,get cards ,return queue
     Player calculateWins(vector<Player> p,Card* cardtab,int size);// calculate wins
     bool isFlush( Card h[],int size );
     void sortBySuit( Card h[],int size );

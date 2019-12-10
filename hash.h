@@ -14,14 +14,7 @@ class Hash
     // Pointer to an array containing buckets
     list<string> *table;
 public:
-    Hash(int V);  // Constructor
 
-    // inserts a key into hash table
-    void insertItem(string x);
-
-    // deletes a key from hash table
-    void deleteItem(string key);
-    int search(string key);
 
     // hash function to map values to key
     unsigned int hashFunction(const std::string& str)
@@ -39,22 +32,19 @@ public:
         return hash;
     }
 
-    void displayHash();
-};
-
-Hash::Hash(int b)
+    Hash(int b)
 {
     this->BUCKET = b;
     table = new list<string>[BUCKET];
 }
 
-void Hash::insertItem(string key)
+void insertItem(string key)
 {
     int index = hashFunction(key);
     table[index].push_back(key);
 }
 
-void Hash::deleteItem(string key)
+void deleteItem(string key)
 {
     // get the hash index of key
     int index = hashFunction(key);
@@ -73,7 +63,7 @@ void Hash::deleteItem(string key)
 }
 
 // function to display hash table
-void Hash::displayHash() {
+void displayHash() {
     for (int i = 0; i < BUCKET; i++) {
         cout << i;
         for (auto x : table[i])
@@ -82,13 +72,14 @@ void Hash::displayHash() {
     }
 }
 
-int Hash::search(string key) {
+int search(string key) {
     int index = hashFunction(key);
     list<string>::iterator it;
     it=find(table[index].begin(),table[index].end(),key);
     if(it!=table[index].end())return 1;
     return -1;
 }
+};
 
 
 #endif //TEXASHOLDEM_HASH_H
