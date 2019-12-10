@@ -23,17 +23,17 @@ int main() {
 
 
     //Input or initialize values Here
-    cout <<FBLU( "Welcome to play Texas Holdem! ")<<endl;
+    cout <<FBLU( "Welcome to play Texas Holdem!（heads-up no-limit） ")<<endl;
     cout <<FBLU( "Please Enter the Blind (10,20,5,2): ")<<endl;
 
-    cin>>blind;
-    //blind=10;
+    //cin>>blind;
+    blind=10;
     cout <<FBLU( "Please Enter the name: ")<<endl;
-    cin>>player.name;
-    //player.name="William";
+   // cin>>player.name;
+    player.name="William";
     cout <<FBLU( "How many chips do you need to buy?(600 or more) ")<<endl;
-    cin>>player.chips;
-    //player.chips=600;
+   // cin>>player.chips;
+    player.chips=600;
     cout <<FBLU( "How many players do you want to play with?(2-6)")<<endl;
 
     //player cant be n<2 or n>6
@@ -67,7 +67,8 @@ int main() {
     //Pre-flop everyone get two cards
     //push to queues
     map<string,Player*> players=utils.processOrderByPreflop(Players,deck,blind,player.name);
-    mainPot=3;
+
+    //addition bouns
 
 
     //call

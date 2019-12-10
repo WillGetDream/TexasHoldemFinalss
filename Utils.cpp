@@ -1171,6 +1171,7 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
             }
             cout<<"winner is:  "<<winner.name<<endl;
 
+            Player win;
             for(int i=0;i<tmp.size();i++){
                 if(!winner.name.compare(tmp.at(i).name)){
                     if(tmp.at(i).chipsOnTable<(mainPot/2)){
@@ -1179,7 +1180,79 @@ map<string, Player *> Utils::processOrderByPreflop(map<Player *, string> players
                         tmp.at(i).chips = tmp.at(i).chips +mainPot;
                     }
                     cout<<"winner "<<tmp.at(i).name<<" chips is :"<<tmp.at(i).chips<<endl;
+                    win.name=tmp.at(i).name;
+                    win.chips=tmp.at(i).chips;
                 }
+            }
+
+            //if((winner.name.compare(playername))==0){
+            if(1){
+                string chall;
+                cout <<FBLU( "Congratulation! You earn maze challenge. 100 dollar when you win. 1 dollar when you lost. Would you like to challenge?(Y or N) ")<<endl;
+                cin>>chall;
+                while(chall.compare("Y")!=0 && chall.compare("N")!=0 ){
+                    cout <<FBLU( "You enter wrong. Please enter Y or N! Congratulation! You earn maze challenge. Double coins when you win. Half coins when you lost. Would you like to challenge?(Y or N) ")<<endl;
+                    cin>>chall;
+                }
+                int m=9, n=9;
+                int a[10][10];
+                vector<vector<int>> ms;
+                Maze maze;
+                ms=maze.generateMaze();
+
+                for(int i=0;i<m;i++){
+                    printf("%d:\t",i);
+                    for(int j=0;j<n;j++) {
+                        a[i][j]=ms.at(i).at(j);
+                        printf("%d ", a[i][j]);
+                    }
+                    printf("\n");
+                }
+                a[4][4]=rand()%2;
+                a[4][5]=rand()%2;
+                for(int i=0;i<m;i++){
+                    printf("%d:\t",i);
+                    for(int j=0;j<n;j++) {
+                        printf("%d ", a[i][j]);
+                    }
+                    printf("\n");
+                }
+
+
+                vector<pii> res;
+                vector<vector<int>> visited(m, vector<int>(n, false));
+                vector<vector<pii>> ret;
+                int min_t = 101;
+                //random set last one
+                maze.dfs(min_t ,a, m, n, 0, 0, res, visited, ret);
+                cout<<FBLU( "QUESTION: Is there a path from (0,0) to (9,9)? (Y or N)");
+                string flag;
+                cin>>flag;
+                if((ret.size()>0&&flag=="Y")||(ret.size()<=0&&flag=="N")){
+                    cout<<"you won 100 dollar!";
+                    win.chips+=100;
+                    cout<<"winner "<<win.name<<" chips is :"<<win.chips<<endl;
+                }else{
+                    cout<<"you lost 1 dollar";
+                    cout<<win.name<<" chips is :"<<win.chips<<endl;
+
+                }
+                if(ret.size()>0){
+                    cout<<"There is a path!"<<endl;
+                    for (int i = 0; i < ret.size(); i++)
+                    {
+                        if (min_t == ret[i].size())
+                        {
+                            for (int k = 0; k < min_t; k++)
+                            {
+                                cout << '(' << ret[i][k].first << ',' << ret[i][k].second << ')' << endl;
+                            }
+                        }
+                    }
+                }
+
+
+
             }
 
 
@@ -1740,7 +1813,8 @@ int Utils::valueHighCard( Card h[] ,int size )
 
     return val;
 }
-
+// dfs(0, 0, n=7, k=5,cards[7] , visited);
+//recursions
 void Utils::dfs(int pos, int cnt, int n, int k, Card a[],bool visited[]) {
 
     if (cnt == k) {
@@ -1774,6 +1848,7 @@ Player Utils::calculateWins(vector<Player> p,Card* cardtab,int size){
     for(int i=0;i<2;i++){
         cout<<endl;
         Card cards[7];
+        //5，6 index belong to people, 0-4 belong to table
         cards[5]=p.at(i).card[0];
         cards[6]=p.at(i).card[1];
 
@@ -1798,8 +1873,11 @@ Player Utils::calculateWins(vector<Player> p,Card* cardtab,int size){
         cout<<endl;
         cout<<"player "<<p.at(i).name<<endl;
         cout<<"combination 5 of 7 cards: "<<endl;
+        //save combination to vector vv
         dfs(0, 0, n, k,a , visited);
 
+        //deckswith values
+        map<Card*,int> decksnValues;
         //get combination
         for(int i=0;i<vv.size();i++){
             Card cardsary[5];
@@ -1807,15 +1885,19 @@ Player Utils::calculateWins(vector<Player> p,Card* cardtab,int size){
                 cardsary[j]=vv.at(i).at(j);
                 cout<<cardsary[j].print()<<"---->";
             }
+
             int s=valueHand(cardsary,5);
-            cout<<i<<"--->"<<s<<endl;
+            decksnValues.insert(make_pair(cardsary,s));
+            cout<<"-->index "<<i<<"--->"<<s<<endl;
             values.push_back(s);
         }
-        //get max
-        sort(values.begin(),values.end(),greater<int>());
+        //recursive sorts
+        cout<<"mergeSort values in hand......"<<endl;
+        mergeSort(values);
+
         cout<<endl;
-        cout<<"best value of hands: "<<values.front()<<endl;
-        p.at(i).valueInHand=values.front();
+        cout<<"best value of hands: "<<values.back()<<endl;
+        p.at(i).valueInHand=values.back();
         vv.clear();
         delete[] visited;
     }
@@ -1824,11 +1906,57 @@ Player Utils::calculateWins(vector<Player> p,Card* cardtab,int size){
     }else if(p.at(0).valueInHand<p.at(1).valueInHand){
         return p.at(1);
     }else{
-
         Player p;
         return p;
     }
 
+}
 
+// merge function
+vector<int> Utils::merge(vector<int> left,vector<int> right){
+    int leftCount = 0;
+    int rightCount = 0;
 
+    vector<int> results;
+
+    bool useLeft;
+    for (int i=0; i<left.size()+right.size();i++){
+        if(leftCount<left.size()){
+            if(rightCount<right.size()){
+                useLeft = (left[leftCount] < right[rightCount]);
+            }
+            else{
+                useLeft = true;
+            }
+        }
+        else{
+            useLeft = false;
+        }
+
+        if (useLeft){
+            results.push_back(left[leftCount]);
+            if (leftCount < left.size()){
+                leftCount++;
+            }
+        }
+        else{
+            results.push_back(right[rightCount]);
+            if (rightCount<right.size()){
+                rightCount++;
+            }
+        }
+    }
+    return results;
+}
+
+// merge sort function
+vector<int> Utils::mergeSort(vector<int> arr){
+    if (arr.size() <= 1){
+        return arr;
+    }
+    int len = floor(arr.size()/2);
+    vector<int> left(arr.begin(), arr.begin()+len);
+    vector<int> right(arr.begin()+len, arr.end());
+
+    return merge(mergeSort(left),mergeSort(right));
 }

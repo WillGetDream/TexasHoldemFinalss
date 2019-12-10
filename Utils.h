@@ -12,6 +12,7 @@
 #include "Position.h"
 #include "DeckOfCards.h"
 #include <queue>
+#include "maze.h"
 using namespace std;
 
 class Utils {
@@ -35,8 +36,8 @@ public:
      int ONE_PAIR       = 1000000;
     vector<vector<Card>> vv;
 
-    map<string, int> getRandomPlayers(int n);                 //get players and chips
-    set<string> RandomNames(int n);                     //read file and get random name
+    map<string, int> getRandomPlayers(int );                 //get players and chips
+    set<string> RandomNames(int );                     //read file and get random name
     map<Player*,string> getRandomPosition(map<string,int> );           //get getRandomPosition
     map<string,Player*> processOrderByPreflop(map<Player*,string> players,DeckOfCards* deck,int blind,string playername);  //proess orderby pre flop,get cards ,return queue
     Player calculateWins(vector<Player> p,Card* cardtab,int size);// calculate wins
@@ -61,7 +62,9 @@ public:
     int valueFlush( Card h[] ,int size );
     int valueStraightFlush( Card h[],int size );
     int valueHand( Card h[],int size );
-    void dfs(int pos, int cnt, int n, int k, Card a[],bool visited[]);
+    void dfs(int , int , int , int , Card a[],bool visited[]);
+    vector<int> mergeSort(vector<int> arr);
+    vector<int> merge(vector<int> left,vector<int> right);
     // void showMianPots(queue<Player*> pq);                    //calculate bets
 
 };
